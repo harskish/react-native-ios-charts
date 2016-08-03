@@ -24,19 +24,25 @@ class ABNumberFormatter : NSNumberFormatter {
         } else {
             self.maximumDecimalPlaces = maximumDecimalPlaces;
         }
+
         super.init();
+        
+        // Customize appearance
+        self.usesSignificantDigits = true;
+        self.minimumSignificantDigits = 2;
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented");
     }
-    
+
+    /* 
     func abbreviateNumber(num: Int) -> String {
         var abbrevNum : String = "";
         var number : Float = Float(num);
         if (num >= 1000) {
-            let abbrev = ["K", "M", "B"];
-            for i in (abbrev.count - 1).stride(to: 0, by: -1) {
+            let abbrev = ["K", "M", "B", "T"];
+            for i in (abbrev.count - 1).stride(to: -1, by: -1) {
                 let size = Float(pow(Double(10), Double((i+1)*3)));
                 if(size <= number) {
                     number = number/size;
@@ -52,6 +58,32 @@ class ABNumberFormatter : NSNumberFormatter {
         
         return abbrevNum;
     }
+    */
+    
+    func abbreviateNumber(number: Int) -> String {
+        var num : Double = Double(number);
+        let sign = ((num < 0) ? "-" : "");
+
+        num = fabs(num);
+
+        if (num < 1000.0) {
+            self.positiveSuffix = "";
+            self.negativeSuffix = "";
+            return "\(sign)\(num)";
+        }
+
+        let units : [String] = ["K", "M", "B", "T"];
+        let exp:Int = Int(log10(num) / 3.0 );
+        
+        self.positiveSuffix = units[exp-1];
+        self.negativeSuffix = units[exp-1];
+      
+        let roundedNum:Double = round(10 * num / pow(1000.0,Double(exp))) / 10;
+
+        return "\(sign)\(roundedNum)";
+    }
+
+    
     
     func floatToString(val: Float) -> String {
         var ret = String(format:"%.\(self.maximumDecimalPlaces)f", val);
@@ -71,10 +103,6 @@ class ABNumberFormatter : NSNumberFormatter {
     
     override func stringForObjectValue(obj: AnyObject) -> String? {
         let value = self.abbreviateNumber(obj as! Int);
-        if String(value.characters.last!) == "0" {
-            return super.stringForObjectValue(Int(value)!);
-        }
-        
         return super.stringForObjectValue(Float(value)!);
     }
 }
