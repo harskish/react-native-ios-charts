@@ -25,13 +25,21 @@ func getLineData(_ labels: [String], json: JSON!) -> LineChartData {
     for set in dataSets! {
         let tmp = JSON(set);
         if tmp["values"].exists() {
-            let values = tmp["values"].arrayObject as! [Double];
+            let strings = tmp["values"].arrayObject;
+            var values: [Double] = [];
+          
+            for value in strings! {
+              values.append(value as? Double ?? Double.nan);
+            }
+          
             let label = tmp["label"].exists() ? tmp["label"].stringValue : "";
             var dataEntries: [ChartDataEntry] = [];
             
             for i in 0..<values.count {
-                let dataEntry = ChartDataEntry(value: values[i], xIndex: i);
-                dataEntries.append(dataEntry);
+                if !values[i].isNaN {
+                    let dataEntry = ChartDataEntry(value: values[i], xIndex: i);
+                    dataEntries.append(dataEntry);
+                }
             }
             
             let dataSet = LineChartDataSet(yVals: dataEntries, label: label);
