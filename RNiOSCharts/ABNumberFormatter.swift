@@ -104,10 +104,6 @@ class ABNumberFormatter : NumberFormatter {
     
     override func string(for obj: Any?) -> String? {
         let value = self.abbreviateNumber(number: obj as! Int);
-        if String(value.characters.last!) == "0" {
-            return super.string(for: Int(value)!);
-        }
-        
         return super.string(for: Float(value)!);
     }
 }
