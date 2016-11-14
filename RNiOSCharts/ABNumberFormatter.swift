@@ -103,7 +103,8 @@ class ABNumberFormatter : NumberFormatter {
     }
     
     override func string(for obj: Any?) -> String? {
-        let value = self.abbreviateNumber(number: obj as! Int);
+        let intValue = (obj as! NSNumber).intValue; // 'obj as! Int' breaks in Swift 3.0.1
+        let value = self.abbreviateNumber(number: intValue);
         return super.string(for: Float(value)!);
     }
 }
